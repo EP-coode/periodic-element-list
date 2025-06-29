@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>Edit element data</h2>
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <mat-form-field>
+      <mat-label>Element name</mat-label>
+      <input matInput type="text" formControlName="name" />
+      @if (form.controls.name.hasError('required') &&
+      form.controls.name.touched) {
+      <mat-error>Element name is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Element weight</mat-label>
+      <input matInput type="number" [min]="0" formControlName="weight" />
+      @if (form.controls.weight.hasError('required') &&
+      form.controls.weight.touched) {
+      <mat-error>Element weight is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Element Symbol</mat-label>
+      <input matInput type="text" formControlName="symbol" />
+      @if (form.controls.symbol.hasError('required') &&
+      form.controls.symbol.touched) {
+      <mat-error>Element symbol is <strong>required</strong></mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button matButton (click)="onNoClick()">Cancel</button>
+  <button matButton="filled" (click)="handleDataSaveClick()" cdkFocusInitial>
+    Save
+  </button>
+</mat-dialog-actions>
