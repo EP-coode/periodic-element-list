@@ -8,12 +8,8 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       {
-        path: 'periodic',
+        path: '',
         children: periodicTableRoutes,
-      },
-      {
-        path: '**',
-        redirectTo: 'periodic',
       },
     ],
   },

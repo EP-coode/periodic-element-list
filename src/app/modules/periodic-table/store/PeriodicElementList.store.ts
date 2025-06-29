@@ -31,62 +31,66 @@ export const INITIAL_STATE = Object.freeze<IPeriodicElementListState>({
 });
 
 // Thank you @ngrx for reinventing NestingHell
-// Wiht simple Service it would be much more readable
+// with simple Service it would be much more readable
 export const PeriodicElementListState = signalStore(
   { providedIn: 'root' },
   withState(INITIAL_STATE),
   withMethods(
-    (store, periodicElemDataAcces = inject(PeriodicElementsDataAcces)) => ({
-      refreshList: rxMethod<string | undefined>(
-        pipe(
-          tap(() => patchState(store, { state: 'loading' })),
-          switchMap((filter) => {
-            return periodicElemDataAcces.getElementListing(filter).pipe(
-              tapResponse({
-                next: (updatedList) => {
-                  patchState(store, () => ({
-                    items: updatedList,
-                    // It looks like either TS is stupid or NGRX has some typing issues
-                    state: 'success' as LoadingState,
-                  }));
-                },
-                // This function will never be called since there is no exception that can be thrown
-                error: (error: unknown) => {
-                  console.error(error);
-                  patchState(store, () => ({ state: 'error' as LoadingState }));
-                },
-              })
-            );
-          })
-        )
-      ),
-      setFilter: (v: string) => {
-        patchState(store, () => ({ filter: v }));
-      },
-      updateElement: rxMethod<IPeriodicElement>(
-        pipe(
-          tap(() => patchState(store, { state: 'loading' })),
-          switchMap((updatedElement) => {
-            return periodicElemDataAcces.updateElement(updatedElement).pipe(
-              tapResponse({
-                next: (updatedList) => {
-                  patchState(store, () => ({
-                    items: updatedList,
-                    // It looks like either TS is stupid or NGRX has some typing issues
-                    state: 'success' as LoadingState,
-                  }));
-                },
-                // This function will never be called since there is no exception that can be thrown
-                error: (error: unknown) => {
-                  console.error(error);
-                  patchState(store, () => ({ state: 'error' as LoadingState }));
-                },
-              })
-            );
-          })
-        )
-      ),
-    })
+    (store, periodicElemDataAcces = inject(PeriodicElementsDataAcces)) => {
+      const methods = {
+        refreshList: rxMethod<string | undefined>(
+          pipe(
+            tap(() => patchState(store, { state: 'loading' })),
+            switchMap((filter) => {
+              return periodicElemDataAcces.getElementListing(filter).pipe(
+                tapResponse({
+                  next: (updatedList) => {
+                    patchState(store, () => ({
+                      items: updatedList,
+                      // It looks like either TS is stupid or NGRX has some typing issues
+                      state: 'success' as LoadingState,
+                    }));
+                  },
+                  // This function will never be called since there is no exception that can be thrown
+                  error: (error: unknown) => {
+                    console.error(error);
+                    patchState(store, () => ({
+                      state: 'error' as LoadingState,
+                    }));
+                  },
+                })
+              );
+            })
+          )
+        ),
+        setFilter: (v: string) => {
+          patchState(store, () => ({ filter: v }));
+        },
+        updateElement: rxMethod<IPeriodicElement>(
+          pipe(
+            tap(() => patchState(store, { state: 'loading' })),
+            switchMap((updatedElement) => {
+              return periodicElemDataAcces.updateElement(updatedElement).pipe(
+                tapResponse({
+                  next: () => {
+                    methods.refreshList(store.filter());
+                  },
+                  // This function will never be called since there is no exception that can be thrown
+                  error: (error: unknown) => {
+                    console.error(error);
+                    patchState(store, () => ({
+                      state: 'error' as LoadingState,
+                    }));
+                  },
+                })
+              );
+            })
+          )
+        ),
+      };
+
+      return methods;
+    }
   ),
   // withComputed won't do the job here
   withHooks({

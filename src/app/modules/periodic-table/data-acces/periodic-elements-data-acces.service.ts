@@ -47,7 +47,7 @@ export class PeriodicElementsDataAcces {
 
   public updateElement(
     updatedElemm: IPeriodicElement
-  ): Observable<IPeriodicElement[]> {
+  ): Observable<IPeriodicElement> {
     const updateElementIndex = this.fakePertiodicElemDataBase.findIndex(
       (e) => e.position === updatedElemm.position
     );
@@ -56,6 +56,6 @@ export class PeriodicElementsDataAcces {
       this.fakePertiodicElemDataBase[updateElementIndex] = updatedElemm;
     }
 
-    return this.getElementListing();
+    return of(updatedElemm);
   }
 }
